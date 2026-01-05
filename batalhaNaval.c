@@ -2,16 +2,16 @@
 
 #define TAM_TABULEIRO 10
 #define TAM_NAVIO 3
+#define TAM_HAB 5
+
 #define AGUA 0
 #define NAVIO 3
+#define HABILIDADE 5
 
 int main() {
 
-
     int tabuleiro[TAM_TABULEIRO][TAM_TABULEIRO];
-
     int i, j;
-
 
     for (i = 0; i < TAM_TABULEIRO; i++) {
         for (j = 0; j < TAM_TABULEIRO; j++) {
@@ -19,86 +19,94 @@ int main() {
         }
     }
 
-    int linhaH = 2, colunaH = 3;
+    tabuleiro[2][3] = NAVIO;
+    tabuleiro[2][4] = NAVIO;
+    tabuleiro[2][5] = NAVIO;
 
-    if (colunaH + TAM_NAVIO <= TAM_TABULEIRO) {
-        int podeColocar = 1;
+    tabuleiro[5][6] = NAVIO;
+    tabuleiro[6][6] = NAVIO;
+    tabuleiro[7][6] = NAVIO;
 
-        for (i = 0; i < TAM_NAVIO; i++) {
-            if (tabuleiro[linhaH][colunaH + i] != AGUA) {
-                podeColocar = 0;
-            }
-        }
 
-        if (podeColocar) {
-            for (i = 0; i < TAM_NAVIO; i++) {
-                tabuleiro[linhaH][colunaH + i] = NAVIO;
-            }
-        }
-    }
+    int cone[TAM_HAB][TAM_HAB];
 
-    int linhaV = 5, colunaV = 6;
-
-    if (linhaV + TAM_NAVIO <= TAM_TABULEIRO) {
-        int podeColocar = 1;
-
-        for (i = 0; i < TAM_NAVIO; i++) {
-            if (tabuleiro[linhaV + i][colunaV] != AGUA) {
-                podeColocar = 0;
-            }
-        }
-
-        if (podeColocar) {
-            for (i = 0; i < TAM_NAVIO; i++) {
-                tabuleiro[linhaV + i][colunaV] = NAVIO;
-            }
+    for (i = 0; i < TAM_HAB; i++) {
+        for (j = 0; j < TAM_HAB; j++) {
+            if (j >= (TAM_HAB / 2 - i) && j <= (TAM_HAB / 2 + i))
+                cone[i][j] = 1;
+            else
+                cone[i][j] = 0;
         }
     }
 
-  
-    int linhaD1 = 0, colunaD1 = 0;
 
-    if (linhaD1 + TAM_NAVIO <= TAM_TABULEIRO &&
-        colunaD1 + TAM_NAVIO <= TAM_TABULEIRO) {
+    int cruz[TAM_HAB][TAM_HAB];
 
-        int podeColocar = 1;
-
-        for (i = 0; i < TAM_NAVIO; i++) {
-            if (tabuleiro[linhaD1 + i][colunaD1 + i] != AGUA) {
-                podeColocar = 0;
-            }
-        }
-
-        if (podeColocar) {
-            for (i = 0; i < TAM_NAVIO; i++) {
-                tabuleiro[linhaD1 + i][colunaD1 + i] = NAVIO;
-            }
+    for (i = 0; i < TAM_HAB; i++) {
+        for (j = 0; j < TAM_HAB; j++) {
+            if (i == TAM_HAB / 2 || j == TAM_HAB / 2)
+                cruz[i][j] = 1;
+            else
+                cruz[i][j] = 0;
         }
     }
 
- 
-    int linhaD2 = 0, colunaD2 = 9;
 
-    if (linhaD2 + TAM_NAVIO <= TAM_TABULEIRO &&
-        colunaD2 - (TAM_NAVIO - 1) >= 0) {
+    int octaedro[TAM_HAB][TAM_HAB];
 
-        int podeColocar = 1;
-
-        for (i = 0; i < TAM_NAVIO; i++) {
-            if (tabuleiro[linhaD2 + i][colunaD2 - i] != AGUA) {
-                podeColocar = 0;
-            }
+    for (i = 0; i < TAM_HAB; i++) {
+        for (j = 0; j < TAM_HAB; j++) {
+            if (abs(i - TAM_HAB / 2) + abs(j - TAM_HAB / 2) <= TAM_HAB / 2)
+                octaedro[i][j] = 1;
+            else
+                octaedro[i][j] = 0;
         }
+    }
 
-        if (podeColocar) {
-            for (i = 0; i < TAM_NAVIO; i++) {
-                tabuleiro[linhaD2 + i][colunaD2 - i] = NAVIO;
+    int origemConeL = 1, origemConeC = 1;
+
+    for (i = 0; i < TAM_HAB; i++) {
+        for (j = 0; j < TAM_HAB; j++) {
+            int l = origemConeL + i;
+            int c = origemConeC + j;
+
+            if (l < TAM_TABULEIRO && c < TAM_TABULEIRO && cone[i][j] == 1) {
+                if (tabuleiro[l][c] == AGUA)
+                    tabuleiro[l][c] = HABILIDADE;
             }
         }
     }
 
 
-    printf("Tabuleiro Batalha Naval:\n\n");
+    int origemCruzL = 5, origemCruzC = 2;
+
+    for (i = 0; i < TAM_HAB; i++) {
+        for (j = 0; j < TAM_HAB; j++) {
+            int l = origemCruzL + i - TAM_HAB / 2;
+            int c = origemCruzC + j - TAM_HAB / 2;
+
+            if (l >= 0 && c >= 0 && l < TAM_TABULEIRO && c < TAM_TABULEIRO && cruz[i][j] == 1) {
+                if (tabuleiro[l][c] == AGUA)
+                    tabuleiro[l][c] = HABILIDADE;
+            }
+        }
+    }
+
+    int origemOctL = 6, origemOctC = 6;
+
+    for (i = 0; i < TAM_HAB; i++) {
+        for (j = 0; j < TAM_HAB; j++) {
+            int l = origemOctL + i - TAM_HAB / 2;
+            int c = origemOctC + j - TAM_HAB / 2;
+
+            if (l >= 0 && c >= 0 && l < TAM_TABULEIRO && c < TAM_TABULEIRO && octaedro[i][j] == 1) {
+                if (tabuleiro[l][c] == AGUA)
+                    tabuleiro[l][c] = HABILIDADE;
+            }
+        }
+    }
+
+    printf("Tabuleiro com Habilidades:\n\n");
 
     for (i = 0; i < TAM_TABULEIRO; i++) {
         for (j = 0; j < TAM_TABULEIRO; j++) {
